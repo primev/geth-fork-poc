@@ -1,0 +1,43 @@
+services:
+  bootnode:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    environment:
+      - GETH_NODE_TYPE=bootnode
+      - BOOT_KEY=7b548c1c0fbe80ef1eb0aaec2edf26fd20fb0d758e94948cf6c5f2a486e735f6
+    networks:
+      poa_net:
+        ipv4_address: '172.13.0.100'
+    ports:
+      - 8545:8545
+      - 8546:8546
+      - 6060:6060
+    volumes:
+      - geth-data-bootnode:/data
+  node1:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - GETH_NODE_TYPE=signer
+      - BLOCK_SIGNER_ADDRESS=0xeD994c05E19e0df0ddd7edA02c4991e33C4ABF3b
+      - BLOCK_SIGNER_PRIVATE_KEY=0x98e15e73749405220be5e2da6d4c1bb97ce4a5963f383c3832469a7f13901aad
+    networks:
+      poa_net:
+        ipv4_address: '172.13.0.2'
+    volumes:
+      - geth-data-node1:/data
+
+networks:
+  poa_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.13.0.0/16
+
+volumes:
+  geth-data-bootnode:
+  geth-data-node1:
+  geth-data-node2:
