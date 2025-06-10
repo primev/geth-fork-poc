@@ -1,0 +1,21 @@
+FROM golang:1.23-alpine AS builder
+
+RUN apk add --no-cache gcc musl-dev linux-headers git make
+
+RUN git clone https://github.com/primev/mev-commit-go-ethereum.git /go-ethereum
+WORKDIR /go-ethereum
+
+RUN make geth
+
+FROM alpine:latest
+
+RUN apk add --no-cache jq
+
+COPY --from=builder /go-ethereum/build/bin/geth /usr/local/bin/
+
+COPY entrypoint_newgeth.sh /entrypoint_newgeth.sh
+RUN chmod +x /entrypoint_newgeth.sh
+
+EXPOSE 8545
+
+ENTRYPOINT ["/entrypoint_newgeth.sh"]

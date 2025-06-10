@@ -7,7 +7,7 @@ services:
       - GETH_NODE_TYPE=bootnode
       - BOOT_KEY=7b548c1c0fbe80ef1eb0aaec2edf26fd20fb0d758e94948cf6c5f2a486e735f6
     networks:
-      poa_net:
+      fork_net:
         ipv4_address: '172.13.0.100'
     ports:
       - 8545:8545
@@ -24,13 +24,70 @@ services:
       - BLOCK_SIGNER_ADDRESS=0xeD994c05E19e0df0ddd7edA02c4991e33C4ABF3b
       - BLOCK_SIGNER_PRIVATE_KEY=0x98e15e73749405220be5e2da6d4c1bb97ce4a5963f383c3832469a7f13901aad
     networks:
-      poa_net:
+      fork_net:
         ipv4_address: '172.13.0.2'
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8545"]
+      interval: 5s
+      timeout: 1s
+      retries: 10
+    volumes:
+      - geth-data-node1:/data
+
+  # Post upgrade
+  # TODO: any fsync on old geth required?
+  newgeth:
+    build:
+      context: .
+      dockerfile: Dockerfile.newgeth
+    networks:
+      fork_net:
+        ipv4_address: '172.13.0.3'
+    volumes:
+      - geth-data-node1:/data
+    depends_on:
+      node1:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    container_name: mev-commit-postgres
+    environment:
+      POSTGRES_DB: mevcommit
+      POSTGRES_USER: mevcommit
+      POSTGRES_PASSWORD: password123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      fork_net:
+        ipv4_address: '172.13.0.4'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mevcommit -d mevcommit"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    command: >
+      postgres
+
+  # TODO: Does cons-node need to depend on anything?
+  cons-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.snode
+    networks:
+      fork_net:
+        ipv4_address: '172.13.0.5'
     volumes:
       - geth-data-node1:/data
 
 networks:
-  poa_net:
+  fork_net:
     driver: bridge
     ipam:
       driver: default
@@ -40,4 +97,5 @@ networks:
 volumes:
   geth-data-bootnode:
   geth-data-node1:
-  geth-data-node2:
+  postgres_data:
+  pgadmin_data:
