@@ -76,6 +76,9 @@ if [ "$GETH_NODE_TYPE" = "bootnode" ]; then
 elif [ "$GETH_NODE_TYPE" = "signer" ]; then
 	echo "Starting signer node"
 
+	# Set upgrade timestamp to 30 seconds from now, in unix milliseconds
+	UPGRADE_TIMESTAMP_MS=$(( $(date +%s) * 1000 + 30000 ))
+
 	exec geth \
 		--verbosity="$VERBOSITY" \
 		--datadir="$GETH_DATA_DIR" \
@@ -106,7 +109,8 @@ elif [ "$GETH_NODE_TYPE" = "signer" ]; then
 		--authrpc.addr="0.0.0.0" \
 		--authrpc.port="8551" \
 		--authrpc.vhosts="*" \
-		--nat extip:$NODE_IP
+		--nat extip:$NODE_IP \
+		--upgrade-timestamp-ms $UPGRADE_TIMESTAMP_MS
 else
 	echo "Invalid GETH_NODE_TYPE specified"
 fi
