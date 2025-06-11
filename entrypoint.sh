@@ -112,9 +112,11 @@ elif [ "$GETH_NODE_TYPE" = "signer" ]; then
 		--nat extip:$NODE_IP \
 		--upgrade-timestamp-ms $UPGRADE_TIMESTAMP_MS
 
-	# TODO: any fsync on old geth required?
-
 	geth export --datadir $GETH_DATA_DIR "$GETH_DATA_DIR/chain.rlp"
+
+	# Shouldn't be necessary, but to be defensive..
+	sync
+
 	touch $GETH_DATA_DIR/export_complete
 
 	# Keep container running for health check

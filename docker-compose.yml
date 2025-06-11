@@ -15,7 +15,7 @@ services:
       - 6060:6060
     volumes:
       - geth-data-bootnode:/data
-  node1:
+  oldgeth:
     build: 
       context: .
       dockerfile: Dockerfile
@@ -32,7 +32,7 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - geth-data-node1:/data
+      - geth-data-oldgeth:/data
 
   newgeth:
     build:
@@ -42,9 +42,10 @@ services:
       fork_net:
         ipv4_address: '172.13.0.3'
     volumes:
-      - geth-data-node1:/data
+      - geth-data-oldgeth:/data
+      - newgeth-data:/newgeth-data
     depends_on:
-      node1:
+      oldgeth:
         condition: service_healthy
 
   postgres:
@@ -82,7 +83,7 @@ services:
       fork_net:
         ipv4_address: '172.13.0.5'
     volumes:
-      - geth-data-node1:/data
+      - geth-data-oldgeth:/data
 
 networks:
   fork_net:
@@ -94,6 +95,7 @@ networks:
 
 volumes:
   geth-data-bootnode:
-  geth-data-node1:
+  geth-data-oldgeth:
+  newgeth-data:
   postgres_data:
   pgadmin_data:
