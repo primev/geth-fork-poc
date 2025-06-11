@@ -40,7 +40,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8545 || exit 1"]
       interval: 5s
-      timeout: 5s
+      timeout: 30s
       retries: 10
     volumes:
       - geth-data-oldgeth:/data

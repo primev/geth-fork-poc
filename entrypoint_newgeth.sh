@@ -10,6 +10,9 @@ echo "importing chain.rlp"
 # Note we may want to do this import with multiple rlp files in case of failures
 geth import --datadir /newgeth-data /data/chain.rlp
 
+echo "genesis.json"
+cat /genesis.json
+
 echo "starting newgeth"
 exec geth --verbosity 5 \
   --datadir /newgeth-data \
@@ -18,9 +21,12 @@ exec geth --verbosity 5 \
   --http.port 8545 \
   --http.addr 0.0.0.0 \
   --http.api "admin,eth,net,web3,engine" \
+  --http.vhosts "*" \
   --port 30303 \
-  --authrpc.jwtsecret /jwt.hex \
+  --authrpc.addr 0.0.0.0 \
   --authrpc.port 8551 \
+  --authrpc.vhosts "*" \
+  --authrpc.jwtsecret /jwt.hex \
   --networkid 17864 \
   --syncmode full \
   --miner.recommit 900ms 
