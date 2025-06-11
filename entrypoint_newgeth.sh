@@ -16,10 +16,11 @@ exec geth --verbosity 5 \
   --nodiscover \
   --http \
   --http.port 8545 \
+  --http.addr 0.0.0.0 \
+  --http.api "admin,eth,net,web3,engine" \
   --port 30303 \
   --authrpc.jwtsecret /jwt.hex \
   --authrpc.port 8551 \
   --networkid 17864 \
-  --http.api "admin,eth,net,web3,engine" \
   --syncmode full \
   --miner.recommit 900ms 

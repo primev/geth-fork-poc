@@ -15,7 +15,8 @@ CREATE INDEX IF NOT EXISTS idx_execution_payloads_block_height ON execution_payl
 CREATE INDEX IF NOT EXISTS idx_execution_payloads_inserted_at ON execution_payloads(inserted_at);
 CREATE INDEX IF NOT EXISTS idx_execution_payloads_payload_id ON execution_payloads(payload_id);
 
+-- Commented out due to: ERROR:  functions in index predicate must be marked IMMUTABLE
 -- Create a partial index for recent payloads (optimization for common queries)
-CREATE INDEX IF NOT EXISTS idx_execution_payloads_recent 
-ON execution_payloads(block_height DESC) 
-WHERE inserted_at > NOW() - INTERVAL '24 hours';
+-- CREATE INDEX IF NOT EXISTS idx_execution_payloads_recent 
+-- ON execution_payloads(block_height DESC) 
+-- WHERE inserted_at > NOW() - INTERVAL '24 hours';

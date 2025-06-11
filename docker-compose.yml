@@ -9,10 +9,6 @@ services:
     networks:
       fork_net:
         ipv4_address: '172.13.0.100'
-    ports:
-      - 8545:8545
-      - 8546:8546
-      - 6060:6060
     volumes:
       - geth-data-bootnode:/data
   oldgeth:
@@ -41,9 +37,16 @@ services:
     networks:
       fork_net:
         ipv4_address: '172.13.0.3'
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8545 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     volumes:
       - geth-data-oldgeth:/data
       - newgeth-data:/newgeth-data
+    ports:
+      - 8545:8545
     depends_on:
       oldgeth:
         condition: service_healthy
@@ -74,7 +77,6 @@ services:
     command: >
       postgres
 
-  # TODO: Does cons-node need to depend on anything?
   cons-node:
     build:
       context: .
@@ -84,6 +86,11 @@ services:
         ipv4_address: '172.13.0.5'
     volumes:
       - geth-data-oldgeth:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      newgeth:
+        condition: service_healthy
 
 networks:
   fork_net:
