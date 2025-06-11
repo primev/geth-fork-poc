@@ -79,7 +79,7 @@ elif [ "$GETH_NODE_TYPE" = "signer" ]; then
 	# Set upgrade timestamp to 30 seconds from now, in unix milliseconds
 	UPGRADE_TIMESTAMP_MS=$(( $(date +%s) * 1000 + 30000 ))
 
-	exec geth \
+	geth \
 		--verbosity="$VERBOSITY" \
 		--datadir="$GETH_DATA_DIR" \
 		--port 30311 \
@@ -111,6 +111,14 @@ elif [ "$GETH_NODE_TYPE" = "signer" ]; then
 		--authrpc.vhosts="*" \
 		--nat extip:$NODE_IP \
 		--upgrade-timestamp-ms $UPGRADE_TIMESTAMP_MS
+
+	# TODO: any fsync on old geth required?
+
+	geth export --datadir $GETH_DATA_DIR "$GETH_DATA_DIR/chain.rlp"
+	touch $GETH_DATA_DIR/export_complete
+
+	# Keep container running for health check
+	tail -f /dev/null
 else
 	echo "Invalid GETH_NODE_TYPE specified"
 fi
