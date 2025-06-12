@@ -119,6 +119,8 @@ elif [ "$GETH_NODE_TYPE" = "signer" ]; then
 
 	touch $GETH_DATA_DIR/export_complete
 
+	echo $UPGRADE_TIMESTAMP_MS > $GETH_DATA_DIR/upgrade_timestamp_ms.txt
+
 	# Keep container running for health check
 	tail -f /dev/null
 else

@@ -16,7 +16,9 @@ COPY --from=builder /go-ethereum/build/bin/geth /usr/local/bin/
 
 COPY genesis.json /genesis.json
 
+RUN jq '.config.blobSchedule = { "cancun": { "target": 3, "max": 6, "baseFeeUpdateFraction": 3338477 }, "prague": { "target": 6, "max": 9, "baseFeeUpdateFraction": 5007716 } }' /genesis.json > /genesis.json.tmp && mv /genesis.json.tmp /genesis.json
 RUN jq '.config.terminalTotalDifficulty = 0' /genesis.json > /genesis.json.tmp && mv /genesis.json.tmp /genesis.json
+RUN jq '.config.terminalTotalDifficultyPassed = true' /genesis.json > /genesis.json.tmp && mv /genesis.json.tmp /genesis.json
 
 COPY entrypoint_newgeth.sh /entrypoint_newgeth.sh
 RUN chmod +x /entrypoint_newgeth.sh
