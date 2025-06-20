@@ -1,28 +1,29 @@
-FROM golang:1.23-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
-RUN apk add --no-cache gcc musl-dev linux-headers git make
+RUN apk add --no-cache gcc g++ musl-dev linux-headers git make
 
-RUN git clone https://github.com/primev/mev-commit-go-ethereum.git /go-ethereum
-WORKDIR /go-ethereum
+RUN git clone https://github.com/primev/erigon.git /erigon
+WORKDIR /erigon
 
-RUN git checkout ms-timestamp
-RUN make geth
+RUN git checkout check-pending
+
+RUN make erigon
 
 FROM alpine:latest
 
-RUN apk add --no-cache jq curl
+RUN apk add --no-cache jq curl libstdc++ libgcc
 
-COPY --from=builder /go-ethereum/build/bin/geth /usr/local/bin/
+COPY --from=builder /erigon/build/bin/erigon /usr/local/bin/
 
-COPY genesis.json /genesis.json
+COPY genesis_erigon.json /genesis.json
 
 RUN jq '.config.blobSchedule = { "cancun": { "target": 3, "max": 6, "baseFeeUpdateFraction": 3338477 }, "prague": { "target": 6, "max": 9, "baseFeeUpdateFraction": 5007716 } }' /genesis.json > /genesis.json.tmp && mv /genesis.json.tmp /genesis.json
 RUN jq '.config.terminalTotalDifficulty = 0' /genesis.json > /genesis.json.tmp && mv /genesis.json.tmp /genesis.json
 RUN jq '.config.terminalTotalDifficultyPassed = true' /genesis.json > /genesis.json.tmp && mv /genesis.json.tmp /genesis.json
 
-COPY entrypoint_newgeth.sh /entrypoint_newgeth.sh
-RUN chmod +x /entrypoint_newgeth.sh
+COPY entrypoint_erigon.sh /entrypoint_erigon.sh
+RUN chmod +x /entrypoint_erigon.sh
 
 EXPOSE 8545
 
-ENTRYPOINT ["/entrypoint_newgeth.sh"]
+ENTRYPOINT ["/entrypoint_erigon.sh"]

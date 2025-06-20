@@ -30,10 +30,10 @@ services:
     volumes:
       - geth-data-oldgeth:/data
 
-  newgeth:
+  erigon:
     build:
       context: .
-      dockerfile: Dockerfile.newgeth
+      dockerfile: Dockerfile.erigon
     networks:
       fork_net:
         ipv4_address: '172.13.0.3'
@@ -44,7 +44,7 @@ services:
       retries: 10
     volumes:
       - geth-data-oldgeth:/data
-      - newgeth-data:/newgeth-data
+      - erigon-data:/erigon-data
     ports:
       - 8545:8545
     depends_on:
@@ -89,7 +89,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      newgeth:
+      erigon:
         condition: service_healthy
 
 networks:
@@ -103,6 +103,6 @@ networks:
 volumes:
   geth-data-bootnode:
   geth-data-oldgeth:
-  newgeth-data:
+  erigon-data:
   postgres_data:
   pgadmin_data:
