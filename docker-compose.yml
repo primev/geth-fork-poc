@@ -97,4 +97,3 @@ volumes:
   erigon-data:
   erigon-follower-data:
   postgres_data:
-  pgadmin_data:

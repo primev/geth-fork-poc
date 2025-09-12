@@ -11,5 +11,5 @@ exec snode leader \
   --evm-build-delay "30ms" \
   --evm-build-delay-empty-block "2s" \
   --api-addr ":9090" \
-  --log-level "info" \
+  --log-level "debug" \
   --tx-pool-polling-interval "10ms"
