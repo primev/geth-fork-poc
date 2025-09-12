@@ -18,7 +18,7 @@ exec erigon \
   --bootnodes "" \
   --nodiscover \
   --http \
-  --http.api "eth,engine,erigon,web3" \
+  --http.api "eth,engine,erigon,web3,txpool" \
   --http.port 8545 \
   --http.addr 0.0.0.0 \
   --http.vhosts "*" \

@@ -14,7 +14,7 @@ FROM alpine:latest
 
 COPY --from=builder /mev-commit/cl/snode /usr/local/bin/
 
-COPY entrypoint_snode.sh /entrypoint_snode.sh
-RUN chmod +x /entrypoint_snode.sh
+COPY entrypoint_follower.sh /entrypoint_follower.sh
+RUN chmod +x /entrypoint_follower.sh
 
-ENTRYPOINT ["/entrypoint_snode.sh"]
+ENTRYPOINT ["/entrypoint_follower.sh"]

@@ -55,6 +55,36 @@ services:
       erigon:
         condition: service_healthy
 
+  erigon-follower:
+    build:
+      context: .
+      dockerfile: Dockerfile.erigon
+    networks:
+      fork_net:
+        ipv4_address: '172.13.0.6'
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8545 || exit 1"]
+      interval: 5s
+      timeout: 30s
+      retries: 10
+    volumes:
+      - erigon-follower-data:/erigon-data
+    ports:
+      - 8546:8545
+
+  follower-cl:
+    build:
+      context: .
+      dockerfile: Dockerfile.follower
+    networks:
+      fork_net:
+        ipv4_address: '172.13.0.7'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      erigon-follower:
+        condition: service_healthy
+
 networks:
   fork_net:
     driver: bridge
@@ -65,5 +95,6 @@ networks:
 
 volumes:
   erigon-data:
+  erigon-follower-data:
   postgres_data:
   pgadmin_data:
