@@ -3,6 +3,8 @@ FROM golang:1.23-alpine AS builder
 RUN apk add --no-cache gcc musl-dev linux-headers git make
 
 RUN git clone https://github.com/primev/mev-commit.git /mev-commit
+WORKDIR /mev-commit
+RUN git checkout leader-redis
 WORKDIR /mev-commit/cl
 
 RUN go mod tidy

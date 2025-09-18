@@ -42,6 +42,21 @@ services:
     command: >
       postgres
 
+  redis:
+    image: redis:7-alpine
+    container_name: mev-commit-redis
+    ports:
+      - "6379:6379"
+    networks:
+      fork_net:
+        ipv4_address: '172.13.0.8'
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
   cons-node:
     build:
       context: .
@@ -53,6 +68,8 @@ services:
       postgres:
         condition: service_healthy
       erigon:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   erigon-follower:
@@ -83,6 +100,8 @@ services:
       postgres:
         condition: service_healthy
       erigon-follower:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
 networks:
